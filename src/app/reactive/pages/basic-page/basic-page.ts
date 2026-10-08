@@ -1,6 +1,8 @@
-import { JsonPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+import { JsonPipe } from '@angular/common';
+
+import { FormUtil } from '@/app/utils';
 
 @Component({
   imports: [JsonPipe, ReactiveFormsModule],
@@ -9,6 +11,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class BasicPage {
   private fb = inject(FormBuilder);
+  formUtil = FormUtil;
+
   public myForm: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     price: [0, [Validators.required, Validators.min(10)]],
@@ -19,28 +23,6 @@ export class BasicPage {
   //   price: new FormControl(0),
   //   inStorage: new FormControl(0),
   // });
-
-  isValidField(field: string): boolean | null {
-    return !!this.myForm.controls[field].errors && this.myForm.controls[field].touched;
-  }
-
-  getFieldError(field: string): string | null {
-    if (!this.myForm.controls[field]) return null;
-    const errors = this.myForm.controls[field].errors || {};
-    for (const key of Object.keys(errors)) {
-      switch (key) {
-        case 'required':
-          return 'This field is required';
-        case 'minlength':
-          return `This field must have at least ${errors['minlength'].requiredLength} characters`;
-        case 'min':
-          return `The minimum value allowed is ${errors['min'].min}`;
-        default:
-          return 'Invalid field';
-      }
-    }
-    return null;
-  }
 
   onSave() {
     if (this.myForm.invalid) {
