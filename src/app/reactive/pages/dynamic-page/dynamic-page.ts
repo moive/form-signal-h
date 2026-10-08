@@ -1,9 +1,26 @@
 import { JsonPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
-  imports: [JsonPipe],
+  imports: [JsonPipe, ReactiveFormsModule],
   selector: 'app-dynamic-page',
   templateUrl: './dynamic-page.html',
 })
-export class DynamicPage {}
+export class DynamicPage {
+  private fb = inject(FormBuilder);
+
+  myForm: FormGroup = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    favoriteGames: this.fb.array(
+      [
+        ['Metal Gear', Validators.required],
+        ['Death Stranding', Validators.required],
+      ],
+      Validators.minLength(3),
+    ),
+  });
+  get favoriteGames() {
+    return this.myForm.get('favoriteGames') as FormArray;
+  }
+}
