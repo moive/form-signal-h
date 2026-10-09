@@ -1,38 +1,40 @@
-import { FormArray, FormGroup, ValidationErrors } from '@angular/forms';
+import { AbstractControl, FormArray, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export class FormUtil {
-  static getTextErrorMessage(errors: ValidationErrors): string | null {
-    for (const key of Object.keys(errors)) {
-      switch (key) {
-        case 'required':
-          return 'This field is required';
-        case 'minlength':
-          return `This field must have at least ${errors['minlength'].requiredLength} characters`;
-        case 'min':
-          return `The minimum value allowed is ${errors['min'].min}`;
-        default:
-          return 'Invalid field';
-      }
+  static isInvalid(control: AbstractControl | null): boolean {
+    return !!control && control.invalid && control.touched;
+  }
+
+  static getErrorMessage(
+    control: AbstractControl | null,
+    options: { fieldName?: string; requiredMessage?: string } = {},
+  ): string | null {
+    const errors = control?.errors;
+
+    if (!errors) return null;
+
+    if (errors['minArrayLength']) {
+      const itemName = options.fieldName ?? 'items';
+      return `Add at least ${errors['minArrayLength'].requiredLength} ${itemName}.`;
     }
-    return null;
-  }
-  static isValidField(form: FormGroup, field: string): boolean | null {
-    return !!form.controls[field].errors && form.controls[field].touched;
+    if (errors['required']) return options.requiredMessage ?? 'This field is required';
+    if (errors['minlength']) {
+      const unit = control instanceof FormArray ? (options.fieldName ?? 'items') : 'characters';
+      return `This field must have at least ${errors['minlength'].requiredLength} ${unit}`;
+    }
+    if (errors['min']) return `The minimum value allowed is ${errors['min'].min}`;
+
+    return 'Invalid field';
   }
 
-  static getFieldError(form: FormGroup, field: string): string | null {
-    if (!form.controls[field]) return null;
-    const errors = form.controls[field].errors || {};
-    return FormUtil.getTextErrorMessage(errors);
-  }
+  static minArrayLength(minimum: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!(control instanceof FormArray)) return null;
 
-  static isValidFieldInArray(formArray: FormArray, index: number): boolean | null {
-    return !!formArray.controls[index].errors && formArray.controls[index].touched;
-  }
-
-  static getFieldErrorInArray(formArray: FormArray, index: number): string | null {
-    if (formArray.controls.length === 0) return null;
-    const errors = formArray.controls[index].errors || {};
-    return FormUtil.getTextErrorMessage(errors);
+      const actualLength = control.length;
+      return actualLength === 0 || actualLength >= minimum
+        ? null
+        : { minArrayLength: { requiredLength: minimum, actualLength } };
+    };
   }
 }

@@ -7,8 +7,10 @@
     <label class="col-sm-3 col-form-label">Name</label>
     <div class="col-sm-9">
       <input class="form-control" placeholder="Name of the person" formControlName="name" />
-      @if (formUtil.isValidField(myForm, 'name')) {
-        <span class="form-text text-danger"> {{ formUtil.getFieldError(myForm, 'name') }} </span>
+      @if (formUtil.isInvalid(myForm.get('name'))) {
+        <span class="form-text text-danger">
+          {{ formUtil.getErrorMessage(myForm.get('name')) }}
+        </span>
       }
     </div>
   </div>
@@ -18,9 +20,16 @@
     <label class="col-sm-3 col-form-label">Add</label>
     <div class="col-sm-9">
       <div class="input-group">
-        <input class="form-control" placeholder="Add favorite game" />
+        <input
+          class="form-control"
+          placeholder="Add favorite game"
+          [formControl]="newFavoriteGame"
+          (keydown.enter)="onAddFavoriteGame($event)"
+        />
 
-        <button class="btn btn-outline-primary" type="button">Add favorite</button>
+        <button class="btn btn-outline-primary" (click)="onAddFavoriteGame($event)" type="button">
+          Add favorite
+        </button>
       </div>
     </div>
   </div>
@@ -34,14 +43,26 @@
           <div class="input-group">
             <input class="form-control" [formControlName]="i" />
 
-            <button class="btn btn-outline-danger" type="button">Delete</button>
+            <button class="btn btn-outline-danger" (click)="onDeleteFavoriteGame(i)" type="button">
+              Delete
+            </button>
           </div>
-          @if (formUtil.isValidFieldInArray(favoriteGames, i)) {
+          @if (formUtil.isInvalid(favoriteGames.at(i))) {
             <span class="form-text text-danger">
-              {{ formUtil.getFieldErrorInArray(favoriteGames, i) }}
+              {{ formUtil.getErrorMessage(favoriteGames.at(i)) }}
             </span>
           }
         </div>
+      }
+      @if (formUtil.isInvalid(favoriteGames)) {
+        <span class="form-text text-danger">
+          {{
+            formUtil.getErrorMessage(favoriteGames, {
+              fieldName: 'favorite games',
+              requiredMessage: 'Favorite game is required.',
+            })
+          }}
+        </span>
       }
     </div>
   </div>
@@ -49,8 +70,8 @@
   <div class="row">
     <div class="col-sm-12">
       <button type="submit" class="btn btn-primary float-end">
-        <!-- [disabled]="myForm.invalid" -->
         Save
+        <!-- [disabled]="myForm.invalid" -->
       </button>
     </div>
   </div>
@@ -62,6 +83,10 @@
 
 <span>Value</span>
 <pre>{{ myForm.value | json }}</pre>
+<br />
+
+<span>Errors</span>
+<pre>{{ myForm.controls['favoriteGames'].errors | json }}</pre>
 <br />
 
 <span>Add Game</span>

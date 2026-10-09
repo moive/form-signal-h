@@ -14,10 +14,10 @@
             placeholder="Product name"
             formControlName="name"
           />
-          @if (formUtil.isValidField(myForm, 'name')) {
+          @if (formUtil.isInvalid(myForm.get('name'))) {
             <span class="form-text text-danger">
               <!-- Must be at least 3 characters -->
-              {{ formUtil.getFieldError(myForm, 'name') }}
+              {{ formUtil.getErrorMessage(myForm.get('name')) }}
             </span>
           }
         </div>
@@ -33,9 +33,9 @@
             placeholder="Product price"
             formControlName="price"
           />
-          @if (formUtil.isValidField(myForm, 'price')) {
+          @if (formUtil.isInvalid(myForm.get('price'))) {
             <span class="form-text text-danger">
-              {{ formUtil.getFieldError(myForm, 'price') }}
+              {{ formUtil.getErrorMessage(myForm.get('price')) }}
             </span>
           }
         </div>
@@ -52,9 +52,9 @@
             formControlName="inStorage"
           />
 
-          @if (formUtil.isValidField(myForm, 'inStorage')) {
+          @if (formUtil.isInvalid(myForm.get('inStorage'))) {
             <span class="form-text text-danger">
-              {{ formUtil.getFieldError(myForm, 'inStorage') }}
+              {{ formUtil.getErrorMessage(myForm.get('inStorage')) }}
             </span>
           }
         </div>
