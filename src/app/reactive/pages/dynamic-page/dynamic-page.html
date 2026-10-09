@@ -1,13 +1,15 @@
 <h2>Reactives: <small> Dynamic </small></h2>
 <hr />
 
-<form autocomplete="off" [formGroup]="myForm">
+<form autocomplete="off" [formGroup]="myForm" (ngSubmit)="onSave()">
   <!-- Name -->
   <div class="mb-3 row">
     <label class="col-sm-3 col-form-label">Name</label>
     <div class="col-sm-9">
       <input class="form-control" placeholder="Name of the person" formControlName="name" />
-      <span class="form-text text-danger"> error message </span>
+      @if (formUtil.isValidField(myForm, 'name')) {
+        <span class="form-text text-danger"> {{ formUtil.getFieldError(myForm, 'name') }} </span>
+      }
     </div>
   </div>
 
@@ -34,7 +36,11 @@
 
             <button class="btn btn-outline-danger" type="button">Delete</button>
           </div>
-          <span class="form-text text-danger"> This field is required </span>
+          @if (formUtil.isValidFieldInArray(favoriteGames, i)) {
+            <span class="form-text text-danger">
+              {{ formUtil.getFieldErrorInArray(favoriteGames, i) }}
+            </span>
+          }
         </div>
       }
     </div>
